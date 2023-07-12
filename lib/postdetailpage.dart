@@ -233,7 +233,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${id}: ${title}',
+              '${id}. ${title}',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
             ),
             SizedBox(height: 8.0),

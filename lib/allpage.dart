@@ -133,7 +133,7 @@ class _AllPageState extends State<AllPage> {
               child: ListTile(
 
                 title: Text(
-                  '${id}: ${title}',
+                  '${id}.${title}',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Column(

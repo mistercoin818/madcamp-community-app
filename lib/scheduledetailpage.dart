@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application/join.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -17,6 +18,7 @@ class ScheduleDetailPage extends StatefulWidget {
 class _ScheduleDetailPageState extends State<ScheduleDetailPage> {
   final TextEditingController _commentController = TextEditingController();
   List<String> _names = [];
+  String group = '';
 
   @override
   void initState() {
@@ -43,7 +45,20 @@ class _ScheduleDetailPageState extends State<ScheduleDetailPage> {
       // print("@@@@@@@@@@@@@@@@@");
 
       final tempjsonData = json.decode(response.body);
+      group = tempjsonData['schedule']['group'].toString();
+      if(group == '0'){
+        group = '전체 분반';
+      }
+      else{
+        group += '분반';
+      }
+      // if(group == 0){
+      //   groupToString = '모든 분반';
+      // }
+      // else if
+      // group == 0 ? groupToString = '모든 분반' : groupToString = "${group.toString()}분반";
       // print(tempjsonData);
+      print(tempjsonData);
       final jsonData = tempjsonData['participants'];
 
       if (response.statusCode == 200) {
@@ -56,6 +71,46 @@ class _ScheduleDetailPageState extends State<ScheduleDetailPage> {
       }
     } catch (e) {
       print('Failed to fetch comments: $e');
+    }
+  }
+
+  Future<void> attend() async{
+    final url = Uri.parse('http://172.10.5.118:443/schedule/attend');
+
+    try{
+      final response = await http.post(
+        url,
+        body: {'kakaoId': MyUser.copyKakaoId, 'scheduleId': widget.schedules['id'].toString()}
+      );
+      if(response.statusCode == 200){
+
+        showSnackBar(context, Text("참가하기가 신청되었습니다."));
+      }
+      else{
+        showSnackBar(context, Text("이미 신청하셨습니다."));
+      }
+    }catch(e){
+      print("참가하기 안 된대!!!!!");
+    }
+  }
+
+  void cancel() async{
+    final url = Uri.parse('http://172.10.5.118:443/schedule/attendcancel');
+
+    try{
+      final response = await http.post(
+          url,
+          body: {'kakaoId': MyUser.copyKakaoId, 'scheduleId': widget.schedules['id'].toString()}
+      );
+      if(response.statusCode == 200){
+
+        showSnackBar(context, Text("일정이 취소되었습니다."));
+      }
+      else{
+        showSnackBar(context, Text("취소 실패!!"));
+      }
+    }catch(e){
+      print("취소도 안 돼!?!?!?!!?!!!!!");
     }
   }
 
@@ -87,7 +142,7 @@ class _ScheduleDetailPageState extends State<ScheduleDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '$id: $title',
+              '$id. $title',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
             ),
             SizedBox(height: 8.0),
@@ -98,6 +153,11 @@ class _ScheduleDetailPageState extends State<ScheduleDetailPage> {
             SizedBox(height: 8.0),
             Text(
               '쓰니: $author',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
+            SizedBox(height: 8.0),
+            Text(
+              '참여 가능 분반: $group',
               style: TextStyle(color: Colors.grey[600]),
             ),
             SizedBox(height: 8.0),
@@ -137,7 +197,21 @@ class _ScheduleDetailPageState extends State<ScheduleDetailPage> {
               ) : Center(
                 child: Text("참가자가 없습니다.")
               )
-              )
+              ),
+            SizedBox(height: 8.0),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(onPressed: (){
+                  attend();
+                }, child: Text('참가하기')),
+                SizedBox(width: 10.0),
+                ElevatedButton(onPressed: (){
+                  cancel();
+                }, child: Text('참가취소')),
+              ],
+            )
         ]
         ),
       ),

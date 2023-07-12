@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application/User.dart';
+import 'package:flutter_application/profiledata.dart';
 import 'package:http/http.dart' as http; // http 패키지 추가
 import 'package:flutter_application/mainpage.dart';
 import 'package:flutter_application/main.dart';
@@ -38,6 +39,7 @@ class _JoinState extends State<Join> {
         body: {'kakaoId': MyUser.copyKakaoId, 'userName': MyUser.copyName, 'nickname': nickname, 'school': selectedDropdown2, 'studentId': MyUser.copyKAISTId.toString(), 'group': selectedDropdown.toString(), 'profileImg': MyUser.copyImageUrl},
       );
       MyUser.copyGroup = selectedDropdown;
+      MyProfile.group = selectedDropdown;
       // 응답 처리
       if (response.statusCode == 200) {
         setState((){

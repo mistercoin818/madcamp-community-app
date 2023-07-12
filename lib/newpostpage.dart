@@ -28,7 +28,7 @@ class NewPostPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('새 글 작성'),
+        title: Text('전제 게시판 새 글 작성'),
         elevation: 0.0,
         backgroundColor: Colors.blueAccent,
         centerTitle: true,

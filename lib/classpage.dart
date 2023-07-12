@@ -8,8 +8,6 @@ import 'package:flutter_application/profiledata.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-import 'package:flutter_application/newpostpage.dart';
-
 class ClassPage extends StatefulWidget {
   final dynamic jsonData;
 
@@ -86,7 +84,7 @@ class _ClassPageState extends State<ClassPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('분반 게시판'),
+        title: Text('${MyProfile.group}분반 게시판'),
         elevation: 0.0,
         backgroundColor: Colors.blueAccent,
         centerTitle: true,
@@ -107,6 +105,7 @@ class _ClassPageState extends State<ClassPage> {
         itemCount: posts.length,
         itemBuilder: (context, index) {
           final post = posts[posts.length - 1 - index]; // 역순으로 가져오기
+          final id = post['id'];
           final title = post['title'];
           final content = post['contents'];
           final author = post['authorName'];
@@ -131,7 +130,7 @@ class _ClassPageState extends State<ClassPage> {
               margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: ListTile(
                 title: Text(
-                  title,
+                  '${id}. ${title}',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Column(

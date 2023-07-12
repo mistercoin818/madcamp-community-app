@@ -105,6 +105,7 @@ class _SchedulePageState extends State<SchedulePage> {
         itemCount: schedules.length,
         itemBuilder: (context, index) {
           final post = schedules[schedules.length - 1 - index]; // 역순으로 가져오기
+          final id = post['id'];
           final title = post['title'];
           final content = post['contents'];
           final author = post['authorName'];
@@ -129,7 +130,7 @@ class _SchedulePageState extends State<SchedulePage> {
               margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: ListTile(
                 title: Text(
-                  title,
+                  '${id}. ${title}',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Column(
