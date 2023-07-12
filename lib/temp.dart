@@ -54,7 +54,7 @@ class _AuthenticationState extends State<Authentication> {
         print("엥???");
       }
     } catch (e) {
-      showSnackBar(context, Text('오류 발생'));
+      showSnackBar(context, Text('인증 오류 발생'));
     }
   }
 

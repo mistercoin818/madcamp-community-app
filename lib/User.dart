@@ -20,6 +20,10 @@ class UserData{
     _copyNickname = value;
   }
 
+  /*
+  #####################################
+   */
+
   late String _copyName= '';
   String get copyName => _copyName;
 
@@ -32,6 +36,13 @@ class UserData{
 
   set copyKAISTId(int value){
     _copyKAISTId = value;
+  }
+
+  late int _copyGroup = -1;
+  int get copyGroup => _copyGroup;
+
+  set copyGroup(int value){
+    _copyGroup = value;
   }
 }
 

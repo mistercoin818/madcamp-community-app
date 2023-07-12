@@ -1,39 +1,78 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:flutter_application/User.dart';
+import 'package:flutter_application/join.dart';
+import 'package:flutter_application/profiledata.dart';
 import 'package:http/http.dart' as http;
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Profile2Page extends StatefulWidget {
-  const Profile2Page({super.key});
+  final dynamic data;
+  const Profile2Page({Key? key, required this.data}) : super(key:key);
 
   @override
   State<Profile2Page> createState() => _Profile2PageState();
 }
 
 class _Profile2PageState extends State<Profile2Page> {
-  File? _imageFile;
-  final ImagePicker _picker = ImagePicker();
+  TextEditingController controller = TextEditingController(text:"${MyProfile.nickname}");
 
-  Future<void> uploadImageToBackend(File imageFile) async {
-    final url = Uri.parse('http://localhost:8000/upload');
-    final request = http.MultipartRequest('POST', url);
-    request.files.add(await http.MultipartFile.fromPath('image', imageFile.path));
+  TextEditingController controller2 = TextEditingController(text:"${MyProfile.instaAcct}");
 
-    final response = await request.send();
+  TextEditingController controller3 = TextEditingController(text:"${MyProfile.githubAcct}");
 
-    if (response.statusCode == 200) {
-      // 이미지 업로드 성공
-      // TODO: 추가적인 처리 로직 작성
-    } else {
-      // 이미지 업로드 실패
-      // TODO: 에러 처리 로직 작성
+  TextEditingController controller4 = TextEditingController(text:"${MyProfile.linkedinAcct}");
+
+  bool isUpdated = false;
+
+  Future<void> sendUpdatedProfile() async{
+    String nickname = controller.text;
+    String insta = controller2.text;
+    String github = controller3.text;
+    String linkedin = controller4.text;
+
+    final url = Uri.parse('http://172.10.5.118:443/profile/updateinfo');
+    print("!?!?!?!?!!");
+    try{
+      print("!?!?!?!?!!222222");
+      final response = await http.post(
+        url,
+        body:{'kakaoId': MyUser.copyKakaoId, 'instaAcct': insta, 'instaPub': 'true', 'githubAcct': github, 'githubPub': 'true', 'linkedinAcct': linkedin, 'linkedinPub': 'true'}
+      );
+      print("!?!?!?!?!!3333");
+
+      MyProfile.nickname = nickname;
+      print(MyProfile.nickname);
+
+      MyProfile.instaAcct = insta;
+      print(MyProfile.instaAcct);
+
+      MyProfile.githubAcct = github;
+      print(MyProfile.githubAcct);
+
+      MyProfile.linkedinAcct = linkedin;
+      print(MyProfile.linkedinAcct);
+
+      if (response.statusCode == 200){
+        setState(() {
+          isUpdated = true;
+        });
+        showSnackBar(context, Text('프로필 수정 완료.'));
+        Navigator.pop(context);
+      }
+
+    }catch(e){
+      print("프로필 수정이 안 됐대!!!!!!");
     }
+
   }
+
 
   @override
   Widget build(BuildContext context) {
+    final profileData = widget.data;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
@@ -45,7 +84,7 @@ class _Profile2PageState extends State<Profile2Page> {
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         child: ListView(
           children: <Widget>[
-            imageProfile(),
+            imageProfile(profileData.profileImg),
             SizedBox(height:20),
             Row(
               children: <Widget>[
@@ -58,7 +97,7 @@ class _Profile2PageState extends State<Profile2Page> {
                   style: TextStyle(fontSize: 16.0, letterSpacing: 1.0),
                 ),
                 Text(
-                  '김태훈',
+                  profileData.userName,
                   style: TextStyle(fontSize: 16.0, letterSpacing: 1.0),
                 )
               ],
@@ -75,7 +114,7 @@ class _Profile2PageState extends State<Profile2Page> {
                   style: TextStyle(fontSize: 16.0, letterSpacing: 1.0),
                 ),
                 Text(
-                  '1분반',
+                  profileData.group.toString(),
                   style: TextStyle(fontSize: 16.0, letterSpacing: 1.0),
                 )
               ],
@@ -92,7 +131,7 @@ class _Profile2PageState extends State<Profile2Page> {
                   style: TextStyle(fontSize: 16.0, letterSpacing: 1.0),
                 ),
                 Text(
-                  '성균관대학교',
+                  profileData.school,
                   style: TextStyle(fontSize: 16.0, letterSpacing: 1.0),
                 )
               ],
@@ -109,13 +148,29 @@ class _Profile2PageState extends State<Profile2Page> {
                   style: TextStyle(fontSize: 16.0, letterSpacing: 1.0),
                 ),
                 Text(
-                  '20236231',
+                  profileData.studentId.toString(),
                   style: TextStyle(fontSize: 16.0, letterSpacing: 1.0),
                 )
               ],
             ),
             SizedBox(height:20),
-            nicknameTextField(),
+            // nicknameTextField(),
+            Row(
+              children: <Widget>[
+                Icon(Icons.check_circle_outline),
+                SizedBox(
+                  width: 10.0,
+                ),
+                Text(
+                  '닉네임: ',
+                  style: TextStyle(fontSize: 16.0, letterSpacing: 1.0),
+                ),
+                Text(
+                  profileData.nickname,
+                  style: TextStyle(fontSize: 16.0, letterSpacing: 1.0),
+                )
+              ],
+            ),
             SizedBox(height:20),
             instagramField(),
             SizedBox(height:20),
@@ -125,9 +180,9 @@ class _Profile2PageState extends State<Profile2Page> {
             SizedBox(height:20),
             ElevatedButton(
                 onPressed: (){
-                  print('수정하기!');
+                  sendUpdatedProfile();
+                  print('프로필 수정완료!');
                 }
-                // => uploadImageToBackend(_imageFile!)
                 ,
                 child: Text('수정하기')
             ),
@@ -138,30 +193,15 @@ class _Profile2PageState extends State<Profile2Page> {
     );
   }
 
-  Widget imageProfile(){
+  Widget imageProfile(String profileImg){
     return Center(
       child: Stack(
         children: <Widget>[
           CircleAvatar(
             radius: 80,
             backgroundImage:
-               AssetImage('assets/MadCamp.png')
+               NetworkImage(profileImg)
           ),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: InkWell(
-              onTap: () {
-                showModalBottomSheet(
-                    context: context, builder: ((builder) => bottomSheet()));
-              },
-              child: Icon(
-                Icons.camera_alt,
-                color: Colors.grey,
-                size: 40,
-              ),
-            )
-          )
         ],
       )
     );
@@ -169,6 +209,7 @@ class _Profile2PageState extends State<Profile2Page> {
 
   Widget nicknameTextField(){
     return TextFormField(
+      controller: controller,
       decoration: InputDecoration(
         border: OutlineInputBorder(
           borderSide: BorderSide(
@@ -193,6 +234,7 @@ class _Profile2PageState extends State<Profile2Page> {
 
   Widget instagramField(){
     return TextFormField(
+      controller: controller2,
       decoration: InputDecoration(
           border: OutlineInputBorder(
             borderSide: BorderSide(
@@ -217,6 +259,7 @@ class _Profile2PageState extends State<Profile2Page> {
 
   Widget githubField(){
     return TextFormField(
+      controller: controller3,
       decoration: InputDecoration(
           border: OutlineInputBorder(
             borderSide: BorderSide(
@@ -241,6 +284,7 @@ class _Profile2PageState extends State<Profile2Page> {
 
   Widget linkedInField(){
     return TextFormField(
+      controller: controller4,
       decoration: InputDecoration(
           border: OutlineInputBorder(
             borderSide: BorderSide(
@@ -261,49 +305,5 @@ class _Profile2PageState extends State<Profile2Page> {
           hintText: 'Input your LinkedIn ID'
       ),
     );
-  }
-
-  Widget bottomSheet(){
-    return Container(
-      height: 100,
-      width: MediaQuery.of(context).size.width,
-      margin: EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 20
-      ),
-      child: Column(
-        children: <Widget>[
-          Text(
-            'Choose Profile photo',
-            style: TextStyle(
-              fontSize: 20,
-            ),
-          ),
-          SizedBox(height: 20,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              ElevatedButton.icon(
-                onPressed: () {
-                  takePhoto(ImageSource.gallery);
-                },
-                icon: Icon(Icons.photo_library, size: 50),
-                label: Text('Gallery', style: TextStyle(fontSize: 20)),
-              ),
-            ],
-          )
-        ],
-      )
-    );
-  }
-
-  Future<void> takePhoto(ImageSource source) async{
-    final pickedFile = await _picker.pickImage(source:source);
-    if(pickedFile != null){
-      setState(() {
-        _imageFile = File(pickedFile!.path);
-      });
-      await uploadImageToBackend(_imageFile!);
-    }
   }
 }

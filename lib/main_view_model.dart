@@ -2,7 +2,7 @@ import 'package:flutter_application/social_login.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 class MainViewModel {
-  late String _kakaoId;
+  late String _kakaoId = '';
   final SocialLogin _socialLogin;
   bool isLogined = false;
   User? user;

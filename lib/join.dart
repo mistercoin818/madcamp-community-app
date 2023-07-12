@@ -14,9 +14,11 @@ class Join extends StatefulWidget {
 class _JoinState extends State<Join> {
 
   TextEditingController controller = TextEditingController(); // nickname
-  TextEditingController controller2 = TextEditingController(); // school
-  List<int> dropdownList = [0, 1, 2, 3, 4];
+  // TextEditingController controller2 = TextEditingController(); // school
+  List<String> dropdownList2 = ['고려대학교', '광주과학기술원', '부산대학교', '성균관대학교', '숙명여자대학교', '울산과학기술원', '전남대학교', '포항공과대학교', '한국과학기술원', '한양대학교'];
+  List<int> dropdownList = [1, 2, 3, 4, 5];
   int selectedDropdown = 1;
+  String selectedDropdown2 = '한국과학기술원';
 
 
   bool isAdded = false; // 회원 인증 여부를 저장하는 변수
@@ -24,7 +26,6 @@ class _JoinState extends State<Join> {
   // 회원 인증 요청을 보내는 함수
   Future<void> joinUser() async {
     String nickname = controller.text;
-    String school = controller2.text;
     // final profileInfo = {};
 
     // Express.js 서버의 URL 설정
@@ -34,23 +35,24 @@ class _JoinState extends State<Join> {
     try {
       final response = await http.post(
         url,
-        body: {'kakaoId': MyUser.copyKakaoId, 'userName': MyUser.copyName, 'nickname': nickname, 'school': school, 'studentId': MyUser.copyKAISTId.toString(), 'group': selectedDropdown.toString(), 'profileImg': MyUser.copyImageUrl},
+        body: {'kakaoId': MyUser.copyKakaoId, 'userName': MyUser.copyName, 'nickname': nickname, 'school': selectedDropdown2, 'studentId': MyUser.copyKAISTId.toString(), 'group': selectedDropdown.toString(), 'profileImg': MyUser.copyImageUrl},
       );
-
+      MyUser.copyGroup = selectedDropdown;
       // 응답 처리
       if (response.statusCode == 200) {
         setState((){
           isAdded = true;
         });
+        print("${MyUser.copyGroup}");
         showSnackBar(context, Text('회원 등록 완료.'));
         navigateToMainPage();
       }
       else{
-        print("엥???");
+        print("엥??????????????");
       }
     } catch (e) {
       print(e);
-      showSnackBar(context, Text('오류 발생'));
+      showSnackBar(context, Text('회원 등록 오류 발생'));
     }
   }
 
@@ -110,13 +112,24 @@ class _JoinState extends State<Join> {
                             decoration: InputDecoration(labelText: '닉네임'),
                             keyboardType: TextInputType.text,
                           ),
-                          TextField(
-                            controller: controller2,
-                            decoration: InputDecoration(labelText: '학교'),
-                            keyboardType: TextInputType.text,
+                          SizedBox(height: 20.0),
+                          Text('모교를 입력해주세요.'),
+                          DropdownButton(
+                            value: selectedDropdown2,
+                            items: dropdownList2.map((String item) {
+                              return DropdownMenuItem<String>(
+                                child: Text('$item'),
+                                value: item,
+                              );
+                            }).toList(),
+                            onChanged: (dynamic value){
+                              setState(() {
+                                selectedDropdown2 = value;
+                              });
+                            },
                           ),
                           SizedBox(height: 20.0),
-                          Text('분반을 입력해주세요.'),
+                          Text('분반을 입력해주세요.(조교님들 == 5)'),
                           DropdownButton(
                               value: selectedDropdown,
                               items: dropdownList.map((int item) {
